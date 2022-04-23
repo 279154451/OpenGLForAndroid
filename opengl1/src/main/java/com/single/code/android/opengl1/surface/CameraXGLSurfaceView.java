@@ -45,7 +45,7 @@ public class CameraXGLSurfaceView extends GLSurfaceView implements ISurface{
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         super.surfaceDestroyed(holder);
-
+        renderer.surfaceDestroyed();
     }
 
     @Override

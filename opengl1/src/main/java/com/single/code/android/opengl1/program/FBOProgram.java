@@ -46,9 +46,9 @@ public abstract class FBOProgram extends BaseProgram {
 
     @Override
     public int onDraw(int texture, float[] mtx) {
-//        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]); //綁定fbo
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, frameBuffer[0]); //綁定fbo
         super.onDraw(texture,mtx);
-//        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);  //
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);  //
         return frameTextures[0];
     }
 

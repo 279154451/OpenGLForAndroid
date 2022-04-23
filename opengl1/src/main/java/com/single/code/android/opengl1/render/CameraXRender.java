@@ -1,16 +1,23 @@
 package com.single.code.android.opengl1.render;
 
 import android.graphics.SurfaceTexture;
+import android.opengl.EGL14;
+import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
+import android.os.Environment;
 
 
 import androidx.camera.core.Preview;
+import androidx.core.content.ContextCompat;
 
 import com.single.code.android.opengl1.program.BaseProgram;
 import com.single.code.android.opengl1.program.CameraFBOProgram;
-import com.single.code.android.opengl1.program.ProgramOES;
-import com.single.code.android.opengl1.program.ScreenFBOProgram;
+import com.single.code.android.opengl1.program.ScreenProgram;
+import com.single.code.android.opengl1.record.MediaRecorder;
+import com.single.code.android.opengl1.record.RecordManager;
 import com.single.code.android.opengl1.surface.ISurface;
+
+import java.io.File;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -26,25 +33,30 @@ public class CameraXRender implements GLSurfaceView.Renderer, Preview.OnPreviewO
     private SurfaceTexture surfaceTexture;
     private BaseProgram cameraProgram;//fbo着色器程序
     private BaseProgram screenProgram;//屏幕着色器程序
+    private IRenderListener listener;
     public CameraXRender(ISurface surface){
         this.surface = surface;
         textureId = new int[1];
+        listener = RecordManager.getManager();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-//        cameraProgram = new CameraFBOProgram();
-        cameraProgram = new ProgramOES();
-        screenProgram = new ScreenFBOProgram();
+        cameraProgram = new CameraFBOProgram();
+        screenProgram = new ScreenProgram();
         surfaceTexture.attachToGLContext(textureId[0]);//将摄像头的数据与创建的纹理关联，attachToGLContext函数内部会调用GLES20.glGenTextures(textures.length, textures, 0);来创建纹理
         surfaceTexture.setOnFrameAvailableListener(this);
+        if(listener != null){
+            listener.onSurfaceCreated(gl,config);
+        }
     }
-
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         cameraProgram.surfaceChange(width,height);
         screenProgram.surfaceChange(width,height);
-
+        if(listener != null){
+            listener.onSurfaceChanged(gl,width,height);
+        }
     }
     float[] mtx = new float[16];
     @Override
@@ -53,7 +65,10 @@ public class CameraXRender implements GLSurfaceView.Renderer, Preview.OnPreviewO
             surfaceTexture.updateTexImage();//更新纹理
             surfaceTexture.getTransformMatrix(mtx);//获得纹理矩阵
             int fboText = cameraProgram.onDraw(textureId[0],mtx);
-//            screenProgram.onDraw(fboText,mtx);
+            fboText=  screenProgram.onDraw(fboText,mtx);
+            if(listener != null){
+                listener.onDrawFrame(fboText,mtx,surfaceTexture);
+            }
         }
     }
 
@@ -67,5 +82,10 @@ public class CameraXRender implements GLSurfaceView.Renderer, Preview.OnPreviewO
     @Override
     public void onUpdated(Preview.PreviewOutput output) {
         surfaceTexture = output.getSurfaceTexture();
+    }
+    public void surfaceDestroyed(){
+        if(listener != null){
+            listener.onSurfaceDestroyed();
+        }
     }
 }

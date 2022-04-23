@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void requestPermission(){
         RxPermissions rxPermissions = new RxPermissions(this);
-        rxPermissions.request( Manifest.permission.CAMERA)
+        rxPermissions.request( Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 .subscribe(granted -> {
                     Log.i("cxw","申请结果:"+granted);
                 });
