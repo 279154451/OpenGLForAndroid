@@ -36,7 +36,8 @@ public class EGLEnv {
                 EGL14.EGL_GREEN_SIZE, 8,//颜色缓冲区中绿色位数
                 EGL14.EGL_BLUE_SIZE, 8, //
                 EGL14.EGL_ALPHA_SIZE, 8,//
-                EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT, //opengl es 2.0
+                EGL14.EGL_RENDERABLE_TYPE,
+                EGL14.EGL_OPENGL_ES2_BIT, //opengl es 2.0
                 EGL14.EGL_NONE
         };
         int[] numConfigs = new int[1];
@@ -52,6 +53,7 @@ public class EGLEnv {
 
         /**
          * EGL上下文
+         *  EGL14.EGL_CONTEXT_CLIENT_VERSION,2，表示使用OpenGL ES 2.0 context（等同于 setEGLContextClientVersion(2)）
          */
         int[] context_attrib_list = {
                 EGL14.EGL_CONTEXT_CLIENT_VERSION,2,
@@ -73,7 +75,7 @@ public class EGLEnv {
         };
         mEglSurface = EGL14.eglCreateWindowSurface(mEglDisplay, mEglConfig, surface, surface_attrib_list, 0);
         // mEglSurface == null
-        if (mEglSurface == null){
+        if (mEglSurface == EGL14.EGL_NO_SURFACE){
             throw new RuntimeException("EGL error " + EGL14.eglGetError());
         }
 
