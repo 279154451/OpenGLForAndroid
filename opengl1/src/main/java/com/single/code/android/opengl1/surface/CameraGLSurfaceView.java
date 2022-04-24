@@ -8,29 +8,30 @@ import android.view.SurfaceHolder;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.single.code.android.opengl1.camera.BaseCamera;
-import com.single.code.android.opengl1.camera.CameraXHelper;
-import com.single.code.android.opengl1.render.CameraXRender;
+import com.single.code.android.opengl1.camera.Camera2Helper;
+import com.single.code.android.opengl1.render.CameraRender;
 
 /**
  * 创建时间：2022/4/16
  * 创建人：singleCode
  * 功能描述：
  **/
-public class CameraXGLSurfaceView extends GLSurfaceView implements ISurface{
-    private CameraXHelper camera;
-    private CameraXRender renderer;
-    public CameraXGLSurfaceView(Context context) {
+public class CameraGLSurfaceView extends GLSurfaceView implements GLView {
+    private BaseCamera camera;
+    private CameraRender renderer;
+    public CameraGLSurfaceView(Context context) {
        this(context,null);
     }
 
-    public CameraXGLSurfaceView(Context context, AttributeSet attrs) {
+    public CameraGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView();
     }
     private void initView(){
-        camera = new CameraXHelper(this);
-        renderer = new CameraXRender(this);
-        camera.startPreview(renderer);//开启预览
+        renderer = new CameraRender(this);
+//        camera = new CameraXHelper(this,renderer);
+        camera = new Camera2Helper(this,renderer);
+        camera.startPreview();//开启预览
         setEGLContextClientVersion(2);//使用OpenGL ES 2.0 context.
         setRenderer(renderer);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);//需要调用requestRender来触发一次render的绘制

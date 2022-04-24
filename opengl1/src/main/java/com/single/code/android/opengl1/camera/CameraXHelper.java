@@ -15,7 +15,7 @@ import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
 import androidx.camera.core.PreviewConfig;
 
-import com.single.code.android.opengl1.surface.ISurface;
+import com.single.code.android.opengl1.surface.GLView;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.locks.ReentrantLock;
@@ -25,20 +25,20 @@ import java.util.concurrent.locks.ReentrantLock;
  * 创建人：singleCode
  * 功能描述：
  **/
-public class CameraXHelper extends BaseCamera{
+public class CameraXHelper extends BaseCamera implements Preview.OnPreviewOutputUpdateListener{
     private String TAG = CameraXHelper.class.getSimpleName();
     private HandlerThread handlerThread;
     private CameraX.LensFacing currentFacing = CameraX.LensFacing.BACK;
-    private Preview.OnPreviewOutputUpdateListener listener;
     private ReentrantLock lock;
     private Preview preview;
-    public CameraXHelper(ISurface surface) {
-        super(surface);
+    private ImageAnalysis imageAnalysis;
+    public CameraXHelper(GLView glView,IPreviewOutputUpdateListener listener) {
+        super(glView,listener);
         lock = new ReentrantLock();
     }
 
-    public void startPreview(Preview.OnPreviewOutputUpdateListener listener){
-        this.listener = listener;
+    @Override
+    public void startPreview(){
         handlerThread = new HandlerThread("Analyze-thread");
         handlerThread.start();
         preview = getPreView();
@@ -50,12 +50,12 @@ public class CameraXHelper extends BaseCamera{
                 .setTargetResolution(new Size(640, 480))
                 .build();
 
-        ImageAnalysis imageAnalysis = new ImageAnalysis(imageAnalysisConfig);
+        imageAnalysis = new ImageAnalysis(imageAnalysisConfig);
         MyAnalyzer myAnalyzer = new MyAnalyzer();
         imageAnalysis.setAnalyzer(myAnalyzer);
 
 
-        CameraX.bindToLifecycle(surface.getLifecycleOwner(), preview, imageAnalysis);
+        CameraX.bindToLifecycle(glView.getLifecycleOwner(), preview, imageAnalysis);
     }
     private Preview getPreView() {
         // 分辨率并不是最终的分辨率，CameraX会自动根据设备的支持情况，结合你的参数，设置一个最为接近的分辨率
@@ -64,9 +64,17 @@ public class CameraXHelper extends BaseCamera{
                 .setLensFacing(currentFacing) //前置或者后置摄像头
                 .build();
         Preview preview = new Preview(previewConfig);
-        preview.setOnPreviewOutputUpdateListener(listener);
+        preview.setOnPreviewOutputUpdateListener(this);
         return preview;
     }
+
+    @Override
+    public void onUpdated(Preview.PreviewOutput output) {
+        if(listener != null){
+            listener.onUpdate(output.getSurfaceTexture());
+        }
+    }
+
     private class MyAnalyzer implements ImageAnalysis.Analyzer {
 
         @Override
@@ -162,7 +170,8 @@ public class CameraXHelper extends BaseCamera{
         }
         return mCameraNV21Byte;
     }
+    @Override
     public void stopPreview(){
-        CameraX.unbind(preview);
+        CameraX.unbind(preview,imageAnalysis);
     }
 }

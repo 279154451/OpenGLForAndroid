@@ -9,7 +9,7 @@ import androidx.lifecycle.LifecycleOwner;
  * 创建人：singleCode
  * 功能描述：
  **/
-public interface ISurface {
+public interface GLView {
     void requestRender();
 
     LifecycleOwner getLifecycleOwner();

@@ -24,6 +24,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
 
 
+import com.single.code.android.opengl1.surface.GLView;
 import com.single.code.android.opengl1.utils.Constants;
 
 import java.lang.ref.WeakReference;
@@ -39,7 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * 功能描述：
  **/
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public class Camera2Helper implements ImageReader.OnImageAvailableListener{
+public class Camera2Helper extends BaseCamera implements ImageReader.OnImageAvailableListener{
     /**
      * 输入的图片类型
      */
@@ -76,8 +77,9 @@ public class Camera2Helper implements ImageReader.OnImageAvailableListener{
     private int inputImageFormat = NV21;
     private AtomicLong atomicLong = new AtomicLong();
 
-    public Camera2Helper(Context activity) {
-        activityWeakReference = new WeakReference<>(activity);
+    public Camera2Helper(GLView glView,IPreviewOutputUpdateListener listener) {
+        super(glView,listener);
+        activityWeakReference = new WeakReference<>(glView.getContext());
     }
 
     public void setCameraListener(CameraListener cameraListener) {
@@ -252,14 +254,17 @@ public class Camera2Helper implements ImageReader.OnImageAvailableListener{
                 mSurfaceTexture.release();
                 mSurface.release();
             }
-            mSurfaceTexture = new SurfaceTexture(mCameraTextureId);
+//            mSurfaceTexture = new SurfaceTexture(mCameraTextureId);
+            mSurfaceTexture = new SurfaceTexture(false);
             mSurfaceTexture.setDefaultBufferSize(Constants.mCameraWidth, Constants.mCameraHeight);
             mSurface = new Surface(mSurfaceTexture);
             views.add(mSurface);
             views.add(mImageReader.getSurface());
             mCameraDevice.createCaptureSession(views,
                     sessionStateCallback, mBackgroundHandler);
-
+            if(listener!= null){
+                listener.onUpdate(mSurfaceTexture);
+            }
         } catch (CameraAccessException e) {
             Log.e(TAG, "createCaptureSession " + e.toString());
         }
@@ -400,7 +405,7 @@ public class Camera2Helper implements ImageReader.OnImageAvailableListener{
         }
     }
 
-    public Surface getmSurface() {
+    public Surface getSurface() {
         return mSurface;
     }
 
@@ -497,6 +502,16 @@ public class Camera2Helper implements ImageReader.OnImageAvailableListener{
         if (cameraListener != null) {
             cameraListener.onPreviewFrame();
         }
+    }
+
+    @Override
+    public void startPreview() {
+        openCamera();
+    }
+
+    @Override
+    public void stopPreview() {
+        releaseCamera();
     }
 
     /**
