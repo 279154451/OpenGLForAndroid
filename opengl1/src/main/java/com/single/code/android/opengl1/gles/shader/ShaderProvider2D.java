@@ -1,16 +1,19 @@
-package com.single.code.android.opengl1.program;
+package com.single.code.android.opengl1.gles.shader;
 
 import android.opengl.GLES20;
+
+import com.single.code.android.opengl1.gles.IShaderProvider;
+import com.single.code.android.opengl1.gles.utils.OpenGLUtils;
 
 /**
  * 创建时间：2022/4/17
  * 创建人：singleCode
  * 功能描述：
  **/
-public class Drawable2D implements IDrawable {
+public class ShaderProvider2D extends IShaderProvider {
     private final static String VertexShader =
-            "attribute vec4 vPosition; //变量 float[4]  一个顶点  java传过来的\n" +
-                    "attribute vec2 vCoord;  //纹理坐标\n" +
+            "attribute vec4 vPosition; //变量float[4],存储四个分量（x,y,z,w）  java传过来的世界坐标系中的顶点坐标\n" +
+                    "attribute vec2 vCoord;  //java传过来的纹理坐标系中的顶点坐标\n" +
                     "varying vec2 aCoord;//传递给片元着色器的变量，varying修饰，片元着色器程序中需要有个一摸一样的变量定义\n" +
                     "uniform mat4 vMatrix;\n" +
                     "//顶点着色器,用来确定要绘制的几何体形状\n" +
@@ -32,6 +35,11 @@ public class Drawable2D implements IDrawable {
                     "//    float r = 0.33*rgba.a+0.59*rgba.g+0.11*rgba.b;//这里是利用305911公式来达到灰度化效果\n" +
                     "//    gl_FragColor = vec4(r,r,r,rgba.a);\n" +
                     "}\n";
+
+    public ShaderProvider2D() {
+        super(OpenGLUtils.VERTEX, OpenGLUtils.TEXTURE);
+    }
+
     @Override
     public int getTextureIdTarget() {
         return GLES20.GL_TEXTURE_2D;

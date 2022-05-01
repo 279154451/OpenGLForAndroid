@@ -1,5 +1,9 @@
-package com.single.code.android.opengl1.program;
+package com.single.code.android.opengl1.gles.program;
 
+
+import com.single.code.android.opengl1.gles.shader.ShaderProviderScreen2D;
+import com.single.code.android.opengl1.gles.BaseProgram;
+import com.single.code.android.opengl1.gles.IShaderProvider;
 
 /**
  * 创建时间：2022/4/17
@@ -8,9 +12,10 @@ package com.single.code.android.opengl1.program;
  **/
 public class ScreenProgram extends BaseProgram {
 
+
     @Override
-    public IDrawable getDrawable() {
-        return new DrawableScreen2D();
+    public IShaderProvider getShaderProvider() {
+        return new ShaderProviderScreen2D();
     }
 
     @Override

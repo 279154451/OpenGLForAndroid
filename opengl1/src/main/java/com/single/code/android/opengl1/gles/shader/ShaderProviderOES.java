@@ -1,16 +1,19 @@
-package com.single.code.android.opengl1.program;
+package com.single.code.android.opengl1.gles.shader;
 
 import android.opengl.GLES11Ext;
+
+import com.single.code.android.opengl1.gles.IShaderProvider;
+import com.single.code.android.opengl1.gles.utils.OpenGLUtils;
 
 /**
  * 创建时间：2022/4/17
  * 创建人：singleCode
  * 功能描述：
  **/
-public class DrawableOES implements IDrawable {
+public class ShaderProviderOES extends IShaderProvider {
     private final static String VertexShader =
-            "attribute vec4 vPosition; //变量 float[4]  一个顶点  java传过来的\n" +
-            "attribute vec4 vCoord;  //纹理坐标\n" +
+            "attribute vec4 vPosition; //变量 float[4]  java传过来的世界坐标系中的顶点坐标\n" +
+            "attribute vec4 vCoord;  //java传过来的纹理坐标系中的顶点坐标\n" +
             "//attribute vec2 vCoord;  //纹理坐标\n" +
             "varying vec2 aCoord;//传递给片元着色器的变量，varying修饰，片元着色器程序中需要有个一摸一样的变量定义\n" +
             "uniform mat4 vMatrix;\n" +
@@ -29,12 +32,17 @@ public class DrawableOES implements IDrawable {
                     "uniform samplerExternalOES  vTexture;  // samplerExternalOES: 图片， 采样器\n" +
                     "//片元着色器，用来绘制上色\n" +
                     "void main(){\n" +
-                    "    //  texture2D: vTexture采样器，采样  aCoord 这个像素点的RGBA值\n" +
+                    "    //  texture2D: vTexture采样器，采样aCoord 这个像素点的RGBA值\n" +
                     "        gl_FragColor =texture2D(vTexture,aCoord);\n" +
                     "//    vec4 rgba = texture2D(vTexture,aCoord);  //rgba\n" +
                     "//    float r = 0.33*rgba.a+0.59*rgba.g+0.11*rgba.b;//这里是利用305911公式来达到灰度化效果\n" +
                     "//    gl_FragColor = vec4(r,r,r,rgba.a);\n" +
                     "}\n";
+
+    public ShaderProviderOES() {
+        super(OpenGLUtils.VERTEX, OpenGLUtils.TEXTURE);
+    }
+
     @Override
     public int getTextureIdTarget() {
         return GLES11Ext.GL_TEXTURE_EXTERNAL_OES;

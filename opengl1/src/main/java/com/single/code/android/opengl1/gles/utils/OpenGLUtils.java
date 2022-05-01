@@ -1,7 +1,8 @@
-package com.single.code.android.opengl1.program;
+package com.single.code.android.opengl1.gles.utils;
 
 import android.content.Context;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +10,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 /**
  * 创建时间：2022/4/17
@@ -18,18 +22,18 @@ import java.io.InputStreamReader;
 public class OpenGLUtils {
     private static final String TAG = "OpenGLUtils";
 
-    public static final float[] VERTEX = {
-            -1.0f, -1.0f,
-            1.0f, -1.0f,
-            -1.0f, 1.0f,
-            1.0f, 1.0f
+    public static final float[] VERTEX = {//世界坐标的原点在画布中间
+            -1.0f, -1.0f,//左下
+            1.0f, -1.0f,//右下
+            -1.0f, 1.0f,//左上
+            1.0f, 1.0f//右上
     };
 
-    public static final float[] TEXURE = {
-            0.0f, 1.0f,
-            1.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 0.0f
+    public static final float[] TEXTURE = {//纹理坐标的原点在左下角
+            0.0f, 0.0f,//左下
+            1.0f, 0.0f,//右下
+            0.0f, 1.0f,//左上
+            1.0f, 1.0f//右上
     };
 
     public static final float[] TEXTURE_NO_ROTATION = {
@@ -103,16 +107,15 @@ public class OpenGLUtils {
         int vShader = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
         //加载着色器代码
         GLES20.glShaderSource(vShader, vSource);
-        //编译（配置）
+        //编译这个着色器（配置）
         GLES20.glCompileShader(vShader);
 
         //查看配置 是否成功
         int[] status = new int[1];
-        GLES20.glGetShaderiv(vShader, GLES20.GL_COMPILE_STATUS, status, 0);
+        GLES20.glGetShaderiv(vShader, GLES20.GL_COMPILE_STATUS, status, 0);//取出编译状态
         if (status[0] != GLES20.GL_TRUE) {
-            //失败
-            throw new IllegalStateException("load vertex shader:" + GLES20.glGetShaderInfoLog
-                    (vShader));
+            //失败，GLES20.glGetShaderInfoLog(vShader)取出着色器信息日志
+            throw new IllegalStateException("load vertex shader:" + GLES20.glGetShaderInfoLog(vShader));
         }
 
         /**
@@ -122,7 +125,7 @@ public class OpenGLUtils {
         int fShader = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
         //加载着色器代码
         GLES20.glShaderSource(fShader, fSource);
-        //编译（配置）
+        //编译这个着色器（配置）
         GLES20.glCompileShader(fShader);
 
         //查看配置 是否成功
@@ -138,6 +141,9 @@ public class OpenGLUtils {
          * 创建着色器程序
          */
         int program = GLES20.glCreateProgram();
+        if(checkGlError("glCreateProgram")){
+            throw new IllegalStateException("glCreateProgram program error");
+        }
         //绑定顶点和片元
         GLES20.glAttachShader(program, vShader);
         GLES20.glAttachShader(program, fShader);
@@ -145,7 +151,7 @@ public class OpenGLUtils {
         GLES20.glLinkProgram(program);
 
 
-        //获得状态
+        //获得链接状态
         GLES20.glGetProgramiv(program, GLES20.GL_LINK_STATUS, status, 0);
         if (status[0] != GLES20.GL_TRUE) {
             throw new IllegalStateException("link program:" + GLES20.glGetProgramInfoLog(program));
@@ -154,7 +160,18 @@ public class OpenGLUtils {
         GLES20.glDeleteShader(fShader);
         return program;
     }
-
+    /**
+     * Checks to see if a GLES error has been raised.
+     */
+    public static boolean checkGlError(String op) {
+        int error = GLES20.glGetError();
+        if (error != GLES20.GL_NO_ERROR) {
+            String msg = op + ": glError 0x" + Integer.toHexString(error);
+            Log.e(TAG, msg);
+            return true;
+        }
+        return false;
+    }
 
     public static void copyAssets2SdCard(Context context, String src, String dst) {
         try {
@@ -173,5 +190,19 @@ public class OpenGLUtils {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    /**
+     * Allocates a direct float buffer, and populates it with the float array data.
+     */
+    private static final int SIZEOF_FLOAT = 4;
+    public static FloatBuffer createFloatBuffer(float[] coords) {
+        // Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
+        //每个顶点都存在一个浮点数组内，每个浮点数又有4个字节，所以这块内存大小为:coords.length * SIZEOF_FLOAT
+        ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT);
+        bb.order(ByteOrder.nativeOrder());
+        FloatBuffer fb = bb.asFloatBuffer();
+        fb.put(coords);
+        fb.position(0);
+        return fb;
     }
 }

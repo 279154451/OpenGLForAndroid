@@ -1,6 +1,9 @@
-package com.single.code.android.opengl1.program;
+package com.single.code.android.opengl1.gles.program;
 
 import android.opengl.GLES20;
+
+import com.single.code.android.opengl1.gles.BaseProgram;
+import com.single.code.android.opengl1.gles.utils.OpenGLUtils;
 
 /**
  * 创建时间：2022/4/17

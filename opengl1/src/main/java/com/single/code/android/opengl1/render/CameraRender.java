@@ -6,9 +6,9 @@ import android.opengl.GLSurfaceView;
 
 
 import com.single.code.android.opengl1.camera.IPreviewOutputUpdateListener;
-import com.single.code.android.opengl1.program.BaseProgram;
-import com.single.code.android.opengl1.program.CameraFBOProgram;
-import com.single.code.android.opengl1.program.ScreenProgram;
+import com.single.code.android.opengl1.gles.BaseProgram;
+import com.single.code.android.opengl1.gles.program.CameraFBOProgram;
+import com.single.code.android.opengl1.gles.program.ScreenProgram;
 import com.single.code.android.opengl1.record.RecordManager;
 import com.single.code.android.opengl1.surface.GLView;
 
