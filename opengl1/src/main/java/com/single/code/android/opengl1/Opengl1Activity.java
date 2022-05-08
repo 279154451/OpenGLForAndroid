@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.single.code.android.opengl1.record.RecordManager;
+import com.qi.tai.opengl.base.record.RecordManager;
 import com.single.code.android.opengl1.widget.RecordButton;
 
 import java.io.File;

@@ -1,3 +1,4 @@
 rootProject.name = "OpenGLForAndroid"
 include ':app'
 include ':opengl1'
+include ':OpenglBase'

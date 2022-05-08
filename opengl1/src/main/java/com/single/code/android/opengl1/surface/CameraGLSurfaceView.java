@@ -7,9 +7,11 @@ import android.view.SurfaceHolder;
 
 import androidx.lifecycle.LifecycleOwner;
 
-import com.single.code.android.opengl1.camera.BaseCamera;
-import com.single.code.android.opengl1.camera.Camera2Helper;
-import com.single.code.android.opengl1.render.CameraRender;
+import com.qi.tai.opengl.base.camera.BaseCamera;
+import com.qi.tai.opengl.base.camera.Camera2Helper;
+import com.qi.tai.opengl.base.render.CameraRender;
+import com.qi.tai.opengl.base.surface.GLView;
+import com.single.code.android.opengl1.utils.Constants;
 
 /**
  * 创建时间：2022/4/16
@@ -31,7 +33,7 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLView {
         renderer = new CameraRender(this);
 //        camera = new CameraXHelper(this,renderer);
         camera = new Camera2Helper(this,renderer);
-        camera.startPreview();//开启预览
+        camera.startPreview(Constants.mCameraWidth,Constants.mCameraHeight);//开启预览
         setEGLContextClientVersion(2);//使用OpenGL ES 2.0 context.
         setRenderer(renderer);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);//需要调用requestRender来触发一次render的绘制
@@ -46,7 +48,7 @@ public class CameraGLSurfaceView extends GLSurfaceView implements GLView {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         super.surfaceDestroyed(holder);
-        renderer.surfaceDestroyed();
+        renderer.onSurfaceDestroy();
     }
 
     @Override
