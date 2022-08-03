@@ -6,7 +6,7 @@ varying vec2 aCoord;
 uniform samplerExternalOES  vTexture;  // samplerExternalOES: 图片， 采样器
 //片元着色器，用来绘制上色
 void main(){
-    //  texture2D: vTexture采样器，采样  aCoord 这个像素点的RGBA值
+    //  texture2D: vTexture采样器，采样aCoord这个像素点的RGBA值
         gl_FragColor =texture2D(vTexture,aCoord);
 //    vec4 rgba = texture2D(vTexture,aCoord);  //rgba
 //    float r = 0.33*rgba.a+0.59*rgba.g+0.11*rgba.b;//这里是利用305911公式来达到灰度化效果

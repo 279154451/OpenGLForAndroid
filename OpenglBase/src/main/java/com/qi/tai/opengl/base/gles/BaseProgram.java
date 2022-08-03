@@ -61,7 +61,9 @@ public abstract class BaseProgram {
          * size:每个顶点数据由几个分量组成
          * type:顶点数据类型
          * stride:从顶点数组缓冲区读取数据时每读一个顶点的跨距（也就是顶点p1和p2之间需要跨多少字节读取）
-         * ptr:顶点数组缓冲区
+         * ptr:顶点坐标数组缓冲区，OpenGL会从缓冲区读取顶点坐标数据然后赋值给VPosition，
+         *     比如：GLES20.glDrawArrays读四个顶点，则OpenGl会分别从缓冲区中读取四次数据给VPosition。
+         *     而每次读取的数据数量就是size,每次读取数据的间隔就是stride
          */
         GLES20.glVertexAttribPointer(vPosition, mShaderProvider.getPointSize(), GLES20.GL_FLOAT, false, 0, mShaderProvider.getVertexBuffer());
         //CPU传数据到GPU，默认情况下着色器无法读取到这个数据。 需要我们启用一下才可以读取
@@ -88,7 +90,7 @@ public abstract class BaseProgram {
          *通知画画
          * mode=GLES20.GL_TRIANGLE_STRIP表示绘制三角形
          * first=0表示从顶点数组的开头开始读取顶点
-         * count=4表示告诉OpenGL读如4个顶点，这样会绘制两个三角形（p1-p2-p3三角形和p2-p3-p4三角形），从而组成一个矩形了
+         * count=4表示告诉OpenGL读取4个顶点，这样会绘制两个三角形（p1-p2-p3三角形和p2-p3-p4三角形），从而组成一个矩形了
          */
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
 //        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,0);
