@@ -44,6 +44,42 @@ public class OpenGLUtils {
             1.0f, 0.0f//右上
     };
 
+    public static int createTexture(int target){
+        int[] textures = new int[1];
+        GLES20.glGenTextures(textures.length, textures, 0);
+        for (int i = 0; i < textures.length; i++) {
+            //与摄像头不同,摄像头是外部纹理 external oes
+            GLES20.glBindTexture(target, textures[i]);
+
+            /**
+             *  必须：设置纹理过滤参数设置
+             */
+            /*设置纹理缩放过滤*/
+            // GL_NEAREST: 使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
+            // GL_LINEAR:  使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
+            // 后者速度较慢，但视觉效果好
+            GLES20.glTexParameteri(target, GLES20.GL_TEXTURE_MAG_FILTER,
+                    GLES20.GL_LINEAR);//放大过滤
+            GLES20.glTexParameteri(target, GLES20.GL_TEXTURE_MIN_FILTER,
+                    GLES20.GL_LINEAR);//缩小过滤
+
+            /**
+             * 可选：设置纹理环绕方向
+             */
+            //纹理坐标的范围是0-1。超出这一范围的坐标将被OpenGL根据GL_TEXTURE_WRAP参数的值进行处理
+            //GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T 分别为x，y方向。
+            //GL_REPEAT:平铺
+            //GL_MIRRORED_REPEAT: 纹理坐标是奇数时使用镜像平铺
+            //GL_CLAMP_TO_EDGE: 坐标超出部分被截取成0、1，边缘拉伸
+//            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S,
+//                    GLES20.GL_CLAMP_TO_EDGE);
+//            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T,
+//                    GLES20.GL_CLAMP_TO_EDGE);
+            GLES20.glBindTexture(target,0);
+        }
+        return textures[0];
+    }
+
 
     public static void glGenTextures(int[] textures) {
         GLES20.glGenTextures(textures.length, textures, 0);
